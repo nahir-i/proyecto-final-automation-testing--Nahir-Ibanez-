@@ -15,8 +15,7 @@ class LoginPage:
 
     def open( self):
         self.driver.get(URL)
-
-
+    
     def login(self , username , password ):
 
         WebDriverWait(self.driver,5).until(

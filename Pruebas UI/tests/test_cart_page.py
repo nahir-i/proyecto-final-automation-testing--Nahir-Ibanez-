@@ -16,11 +16,12 @@ def test_cart_operations(driver):
     # Agregar producto y ir al carrito
     inventory.add_product_to_cart(0)
     inventory.go_to_cart()
-    
+
+    # Verificar contador
     assert cart.is_at_page()
     assert cart.get_cart_items_count() == 1
     
-    # Continuar comprando
+    # Suegir comprando
     cart.continue_shopping()
     assert inventory.is_at_page()
 
@@ -38,5 +39,5 @@ def test_remove_from_cart(driver):
     
     initial_count = cart.get_cart_items_count()
     cart.remove_item(0)
-    
+    # Verificar que un ítem fue removido y el badge se actualizó
     assert cart.get_cart_items_count() == initial_count - 1

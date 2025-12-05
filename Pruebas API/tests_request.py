@@ -1,34 +1,19 @@
 import requests
 import pytest
-import logging
+from datetime import datetime
+from conftest import logger
 from faker import Faker
-import pathlib
 
 
-
-# Configuración
+# Configuración API y Faker
 BASE_URL = "https://jsonplaceholder.typicode.com"
 fake= Faker()
 
-path_dir = pathlib.Path('logs')
-path_dir.mkdir(exist_ok=True)
-
-
-logging.basicConfig(
-    filename= path_dir/ "historial.log",
-    level= logging.INFO,
-    format='%(asctime)s %(levelname)s %(name)s – %(message)s',
-    datefmt='%H:%M:%S'
-)
-
-logger = logging.getLogger()
-
+# Creación de la clase para testear las peticiones a la API
 class TestJSONPlaceholder:
-    """Tests para JSONPlaceholder API - Permite operaciones reales"""
     
     # TEST 1: GET - Obtener todos los posts (Éxito)
     def test_get_posts_success(self):
-        """GET /posts - Obtener lista de posts exitosamente"""
         logger.info("\n=== Test 1: GET Posts ===")
         
         # Hacer petición GET
@@ -36,8 +21,7 @@ class TestJSONPlaceholder:
         
         # Validar código de estado
         assert response.status_code == 200, f"Esperado 200, Obtenido {response.status_code}"
-        print("✅ Código de estado 200 - OK")
-        logger.info("✅ Código de estado 200 - OK")
+        logger.info(f"Petición GET /posts. Status: {response.status_code} OK")
         
         # Convertir a JSON
         data = response.json()
@@ -45,29 +29,27 @@ class TestJSONPlaceholder:
         # Validar estructura del JSON
         assert isinstance(data, list), "La respuesta debería ser una lista"
         assert len(data) > 0, "La lista no debería estar vacía"
-        print("✅ Estructura JSON correcta")
+        logger.info("Estructura JSON correcta")
         
-        # Validar estructura del primer post
+        # Validar estructura
         first_post = data[0]
         required_fields = ["userId", "id", "title", "body"]
         for field in required_fields:
             assert field in first_post, f"Campo '{field}' no encontrado"
-        print("✅ Estructura del post correcta")
-        
+        logger.info("Test GET Posts completado exitosamente!")
+
         # Validar tipos de datos
         assert isinstance(first_post["id"], int)
         assert isinstance(first_post["title"], str)
         assert isinstance(first_post["body"], str)
-        print("✅ Tipos de datos correctos")
+        logger.info("Tipos de datos correctos")
         
-        print("🎉 Test GET Posts completado exitosamente!")
     
     # TEST 2: POST - Crear un nuevo post (Éxito)
     def test_create_post_success(self):
-        """POST /posts - Crear un nuevo post exitosamente"""
-        print("\n=== Test 2: CREATE Post ===")
+        logger.info("\n=== Test 2: CREATE Post ===")
         
-        # Datos para crear el post
+        # Creación de datos para crear el post
         post_data = {
             "title": fake.word(),
             "body": fake.text(),
@@ -79,7 +61,7 @@ class TestJSONPlaceholder:
         
         # Validar código de estado
         assert response.status_code == 201, f"Esperado 201, obtenido {response.status_code}"
-        print("✅ Código de estado 201 - Created")
+        logger.info("Código de estado 201 - Created")
         
         # Convertir a JSON
         data = response.json()
@@ -88,26 +70,25 @@ class TestJSONPlaceholder:
         expected_fields = ["id", "title", "body", "userId"]
         for field in expected_fields:
             assert field in data, f"Campo '{field}' no encontrado en respuesta"
-        print("✅ Estructura de respuesta correcta")
+        logger.info("Estructura de respuesta correcta")
         
         # Validar que los datos se guardaron correctamente
         assert data["title"] == post_data["title"]
         assert data["body"] == post_data["body"]
         assert data["userId"] == post_data["userId"]
-        print("✅ Datos guardados correctamente")
+        logger.info("Datos guardados correctamente")
         
         # Validar que se asignó un ID (simulado por JSONPlaceholder)
         assert data["id"] == 101, f"Expected ID 101, got {data['id']}"
-        print("✅ ID asignado correctamente")
+        logger.info("ID asignado correctamente")
         
-        print("🎉 Test CREATE Post completado exitosamente!")
+        logger.info("Test CREATE Post completado exitosamente!")
     
     # TEST 3: DELETE - Eliminar un post (Éxito)
     def test_delete_post_success(self):
-        """DELETE /posts/{id} - Eliminar un post exitosamente"""
-        print("\n=== Test 3: DELETE Post ===")
+        logger.info("\n=== Test 3: DELETE Post ===")
         
-        # ID del post a eliminar (usamos uno que sabemos que existe)
+        # ID del post a eliminar
         post_id = 1
         
         # Hacer petición DELETE
@@ -115,12 +96,10 @@ class TestJSONPlaceholder:
         
         # Validar código de estado
         assert response.status_code == 200, f"Esperado 200, obtenido {response.status_code}"
-        print("✅ Código de estado 200 - OK")
+        logger.info("Código de estado 200 - OK")
         
-        # JSONPlaceholder devuelve un objeto vacío para DELETE exitoso
         data = response.json()
         assert data == {}, f"Esperado un diccionario vacio, obtenido {data}"
-        print("✅ Respuesta DELETE correcta")
+        logger.info("Respuesta DELETE correcta")
         
-        print("🎉 Test DELETE Post completado exitosamente!")
-    
+        logger.info("Test DELETE Post completado exitosamente!")

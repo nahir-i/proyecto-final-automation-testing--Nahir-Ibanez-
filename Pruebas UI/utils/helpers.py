@@ -26,12 +26,6 @@ def get_driver():
 
     return driver
 
-
-
-
-
-
-
 def get_file_path(file_name, folder="data"):
      #Ruta Relativa
     current_file = os.path.dirname(__file__) #EL ARCHIVO DONDE ESTOY
